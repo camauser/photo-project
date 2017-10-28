@@ -11,6 +11,8 @@ function getImages($album)
     foreach ($dir as $fileinfo)
     {
         $ext = $fileinfo->getExtension();
+        // Convert to lowercase to get all extension possibilities
+        $ext = strtolower($ext);
         if ($ext == "jpg" || $ext == "jpeg" || $ext == "png" || $ext == "bmp" || $ext == "gif")
         {
             array_push($aImageNames, $fileinfo->getFilename());
@@ -49,8 +51,6 @@ function getAlbums()
         if (!$fileinfo->isDot())
         {
             array_push($aAlbums, $fileinfo->getFilename());
-
-            //echo $fileinfo->getFilename() . "<br />";
         }
     }
 

@@ -9,45 +9,7 @@
 // Adjust as needed for your project
     session_start();
     ini_set("max_execution_time", 900);
-
-function getAlbums()
-{
-    $aAlbums = array();
-    $dir = new DirectoryIterator("img");
-        foreach ($dir as $fileinfo) 
-        {
-            if (!$fileinfo->isDot()) 
-            {
-                array_push($aAlbums, $fileinfo->getFilename());
-            }
-        }
-
-    usort($aAlbums, function($a, $b) { 
-        return strnatcmp($a, $b);
-    });
-
-    return $aAlbums;
-}
-
-function getImages($album)
-{
-    $aImageNames = array();
-    $dir = new DirectoryIterator("img/$album");
-        foreach ($dir as $fileinfo) 
-        {
-            $ext = $fileinfo->getExtension();
-            if ($ext == "jpg" || $ext == "jpeg" || $ext == "png" || $ext == "bmp" || $ext == "gif") 
-            {
-                array_push($aImageNames, $fileinfo->getFilename());
-            }
-        }
-
-    usort($aImageNames, function($a, $b) { 
-        return strnatcmp($a, $b);
-    });
-
-    return $aImageNames;
-}
+    include_once("include/index_functions.php");
 
 function previousImgExists($imgName, $dir)
 {
@@ -123,7 +85,6 @@ function regenerateAllThumbnails()
         foreach($aImages as $currImg)
         {
             thumbnailGen($currImg, $currAlbum);
-            
         }
         
     }
@@ -183,6 +144,13 @@ function sendZipToClient($dir)
     header('Content-Length: ' . filesize("img/$dir/$dir.zip"));
     header('Connection: close');
     readfile("img/$dir/$dir.zip");
+
+    // Make sure output isn't being buffered - this can cause "out of memory" issues
+    // Solution courtesy of: https://stackoverflow.com/questions/31277672/allowed-memory-exhausted-when-using-readfile
+    if (ob_get_level())
+    {
+        ob_end_clean();
+    }
     
     // Some code to make sure that the file is deleted after downloading
     // Source: https://stackoverflow.com/questions/5603851/how-to-create-a-zip-file-using-php-and-delete-it-after-user-downloads-it
